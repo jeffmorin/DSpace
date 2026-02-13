@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.bulkaccesscontrol.exception.BulkAccessControlException;
 import org.dspace.app.bulkaccesscontrol.model.AccessCondition;
 import org.dspace.app.bulkaccesscontrol.model.AccessConditionBitstream;
@@ -235,7 +236,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         if (StringUtils.isEmpty(mode)) {
             handler.logError("item mode node must be provided");
             throw new BulkAccessControlException("item mode node must be provided");
-        } else if (!(StringUtils.equalsAny(mode, ADD_MODE, REPLACE_MODE))) {
+        } else if (!(Strings.CS.equalsAny(mode, ADD_MODE, REPLACE_MODE))) {
             handler.logError("wrong value for item mode<" + mode + ">");
             throw new BulkAccessControlException("wrong value for item mode<" + mode + ">");
         } else if (ADD_MODE.equals(mode) && isEmpty(accessConditions)) {
@@ -268,7 +269,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         if (StringUtils.isEmpty(mode)) {
             handler.logError("bitstream mode node must be provided");
             throw new BulkAccessControlException("bitstream mode node must be provided");
-        } else if (!(StringUtils.equalsAny(mode, ADD_MODE, REPLACE_MODE))) {
+        } else if (!(Strings.CS.equalsAny(mode, ADD_MODE, REPLACE_MODE))) {
             handler.logError("wrong value for bitstream mode<" + mode + ">");
             throw new BulkAccessControlException("wrong value for bitstream mode<" + mode + ">");
         } else if (ADD_MODE.equals(mode) && isEmpty(accessConditions)) {
@@ -416,7 +417,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         discoverQuery.setQuery(query);
         discoverQuery.setStart(start);
         discoverQuery.setMaxResults(limit);
-
+        discoverQuery.setSortField("search.resourceid", DiscoverQuery.SORT_ORDER.asc);
         return discoverQuery;
     }
 

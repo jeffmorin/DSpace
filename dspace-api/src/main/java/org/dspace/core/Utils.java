@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +25,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
@@ -401,13 +404,13 @@ public final class Utils {
      */
     public static String getBaseUrl(String urlString) {
         try {
-            URL url = new URL(urlString);
+            URL url = URI.create(urlString).toURL();
             String baseUrl = url.getProtocol() + "://" + url.getHost();
             if (url.getPort() != -1) {
                 baseUrl += (":" + url.getPort());
             }
             return baseUrl;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return null;
         }
     }
@@ -419,14 +422,14 @@ public final class Utils {
      */
     public static String getHostName(String uriString) {
         try {
-            URL url = new URL(uriString);
+            URL url = URI.create(uriString).toURL();
             String hostname = url.getHost();
             // remove the "www." from hostname, if it exists
             if (hostname != null) {
                 return hostname.startsWith("www.") ? hostname.substring(4) : hostname;
             }
             return null;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return null;
         }
     }
@@ -478,4 +481,25 @@ public final class Utils {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         return StringSubstitutor.replace(string, config.getProperties());
     }
+
+    /**
+     * Get the maximum timestamp that can be stored in a PostgreSQL database with hibernate,
+     * for our "distant future" access expiry date.
+     * @return the maximum timestamp that can be stored with Postgres + Hibernate
+     */
+    public static Instant getMaxTimestamp() {
+        return LocalDateTime.of(294276, 12, 31, 23, 59, 59)
+                .toInstant(ZoneOffset.UTC);
+    }
+
+    /**
+     * Get the minimum timestamp that can be stored in a PostgreSQL database, for date validation or any other
+     * purpose to ensure we don't try to store a date before the epoch.
+     * @return the minimum timestamp that can be stored with Postgres + Hibernate
+     */
+    public static Instant getMinTimestamp() {
+        return LocalDateTime.of(-4713, 11, 12, 0, 0, 0)
+                .toInstant(ZoneOffset.UTC);
+    }
+
 }

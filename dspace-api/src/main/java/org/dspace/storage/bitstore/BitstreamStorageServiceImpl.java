@@ -92,6 +92,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     }
 
     @Override
+    public void setIncomingExternal(int incoming) {
+        this.incoming = incoming;
+    }
+
+    @Override
     public void afterPropertiesSet() throws Exception {
         for (Map.Entry<Integer, BitStoreService> storeEntry : stores.entrySet()) {
             if (storeEntry.getValue().isEnabled() && !storeEntry.getValue().isInitialized()) {
@@ -424,7 +429,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             //modulo
             if ((processedCounter % batchCommitSize) == 0) {
                 log.info("Migration Commit Checkpoint: " + processedCounter);
-                context.dispatchEvents();
+                context.commit();
             }
         }
 
